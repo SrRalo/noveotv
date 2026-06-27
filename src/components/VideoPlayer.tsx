@@ -13,6 +13,13 @@ export function VideoPlayer({ channel }: Props) {
   const [error, setError] = useState(false);
   const [loading, setLoading] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
+  const [sourceIndex, setSourceIndex] = useState(0);
+
+  const effectiveUrl = channel?.sources?.[sourceIndex]?.url ?? channel?.url ?? '';
+
+  useEffect(() => {
+    setSourceIndex(0);
+  }, [channel?.url]);
 
   useEffect(() => {
     if (!channel || channel.type === 'embed') return;
@@ -25,7 +32,7 @@ export function VideoPlayer({ channel }: Props) {
 
     if (Hls.isSupported()) {
       hls = new Hls();
-      hls.loadSource(channel.url);
+      hls.loadSource(effectiveUrl);
       hls.attachMedia(video);
       hls.on(Hls.Events.ERROR, (_event, data) => {
         if (data.fatal) {
@@ -38,7 +45,7 @@ export function VideoPlayer({ channel }: Props) {
         video.play().catch(() => {});
       });
     } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
-      video.src = channel.url;
+      video.src = effectiveUrl;
       setLoading(false);
     } else {
       setError(true);
@@ -49,7 +56,7 @@ export function VideoPlayer({ channel }: Props) {
       if (hls) hls.destroy();
       video.src = '';
     };
-  }, [channel]);
+  }, [channel, effectiveUrl]);
 
   const toggleFullscreen = useCallback(() => {
     const el = containerRef.current;
@@ -79,29 +86,54 @@ export function VideoPlayer({ channel }: Props) {
 
   if (channel.type === 'embed') {
     return (
-      <div ref={containerRef} className="relative bg-black rounded-xl overflow-hidden shadow-lg aspect-video group">
-        <iframe
-          ref={iframeRef}
-          src={channel.url}
-          className="w-full h-full"
-          allow="encrypted-media; picture-in-picture"
-          allowFullScreen
-          style={{ border: 0 }}
-        />
-        <button
-          onClick={toggleFullscreen}
-          className="absolute bottom-4 right-4 p-2 rounded-lg bg-black/50 hover:bg-black/70 text-white transition-opacity opacity-0 group-hover:opacity-100 cursor-pointer"
-          title="Pantalla completa"
-        >
-          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            {isFullscreen ? (
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 9V4.5M9 9H4.5M9 9L3.75 3.75M9 15v4.5M9 15H4.5M9 15l-5.25 5.25M15 9h4.5M15 9V4.5M15 9l5.25-5.25M15 15h4.5M15 15v4.5m0-4.5l5.25 5.25" />
-            ) : (
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3.75 3.75v4.5m0-4.5h4.5m-4.5 0L9 9M3.75 20.25v-4.5m0 4.5h4.5m-4.5 0L9 15M20.25 3.75h-4.5m4.5 0v4.5m0-4.5L15 9m5.25 11.25h-4.5m4.5 0v-4.5m0 4.5L15 15" />
-            )}
-          </svg>
-        </button>
-      </div>
+      <>
+        <div ref={containerRef} className="relative bg-black rounded-xl overflow-hidden shadow-lg aspect-video group">
+          <iframe
+            ref={iframeRef}
+            key={sourceIndex}
+            src={effectiveUrl}
+            className="w-full h-full"
+            allow="encrypted-media; picture-in-picture"
+            allowFullScreen
+            style={{ border: 0 }}
+          />
+          <button
+            onClick={toggleFullscreen}
+            className="absolute bottom-4 right-4 p-2 rounded-lg bg-black/50 hover:bg-black/70 text-white transition-opacity opacity-0 group-hover:opacity-100 cursor-pointer"
+            title="Pantalla completa"
+          >
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              {isFullscreen ? (
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 9V4.5M9 9H4.5M9 9L3.75 3.75M9 15v4.5M9 15H4.5M9 15l-5.25 5.25M15 9h4.5M15 9V4.5M15 9l5.25-5.25M15 15h4.5M15 15v4.5m0-4.5l5.25 5.25" />
+              ) : (
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3.75 3.75v4.5m0-4.5h4.5m-4.5 0L9 9M3.75 20.25v-4.5m0 4.5h4.5m-4.5 0L9 15M20.25 3.75h-4.5m4.5 0v4.5m0-4.5L15 9m5.25 11.25h-4.5m4.5 0v-4.5m0 4.5L15 15" />
+              )}
+            </svg>
+          </button>
+        </div>
+        {channel.sources && channel.sources.length > 1 && (
+          <div className="flex items-center gap-2 mt-3">
+            <label className="text-sm font-medium text-gray-500 dark:text-gray-400 whitespace-nowrap">
+              Fuente:
+            </label>
+            <div className="flex flex-wrap gap-1.5">
+              {channel.sources.map((s, i) => (
+                <button
+                  key={i}
+                  onClick={() => setSourceIndex(i)}
+                  className={`px-3 py-1 rounded-md text-xs font-medium transition-colors cursor-pointer ${
+                    i === sourceIndex
+                      ? 'bg-indigo-600 text-white'
+                      : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600'
+                  }`}
+                >
+                  {s.tag}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+      </>
     );
   }
 
@@ -109,6 +141,7 @@ export function VideoPlayer({ channel }: Props) {
     <div ref={containerRef} className="relative bg-black rounded-xl overflow-hidden shadow-lg aspect-video group">
       <video
         ref={videoRef}
+        key={sourceIndex}
         controls
         autoPlay
         playsInline

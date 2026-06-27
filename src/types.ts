@@ -1,9 +1,15 @@
+export interface StreamSource {
+  tag: string;
+  url: string;
+}
+
 export interface Channel {
   name: string;
   group: string;
   type: 'hls' | 'embed';
   url: string;
   poster?: string;
+  sources?: StreamSource[];
 }
 
 export interface ChannelsResponse {
@@ -11,10 +17,20 @@ export interface ChannelsResponse {
   groups: string[];
 }
 
+export interface PpvSubstream {
+  id: number;
+  name: string;
+  tag: string;
+  source_tag: string;
+  uri_name: string;
+  iframe: string;
+}
+
 export interface PpvStream {
   id: number;
   name: string;
   tag: string;
+  source_tag?: string;
   poster: string;
   uri_name: string;
   starts_at: number;
@@ -23,6 +39,7 @@ export interface PpvStream {
   category_name: string;
   iframe?: string;
   allowpaststreams: number;
+  substreams?: PpvSubstream[];
 }
 
 export interface PpvCategory {

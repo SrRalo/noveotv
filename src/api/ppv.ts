@@ -1,6 +1,7 @@
-import type { Channel, PpvResponse } from '../types';
+import type { Channel, PpvResponse, StreamSource } from '../types';
 
 const BASE_URL = 'https://api.ppv.to';
+const TARGET_CATEGORY = 'Football';
 
 export async function fetchPpvStreams(): Promise<Channel[]> {
   const res = await fetch(`${BASE_URL}/api/streams`);
@@ -11,20 +12,35 @@ export async function fetchPpvStreams(): Promise<Channel[]> {
   const channels: Channel[] = [];
 
   for (const category of data.streams) {
+    if (category.category !== TARGET_CATEGORY) continue;
+
     for (const stream of category.streams) {
       const now = Math.floor(Date.now() / 1000);
       const isLive = stream.starts_at <= now && now < stream.ends_at;
       const isUpcoming = stream.starts_at > now && stream.starts_at - now <= 3600;
       if (!isLive && !isUpcoming && !stream.always_live) continue;
 
-      if (!stream.iframe) continue;
+      const sources: StreamSource[] = [];
+
+      if (stream.iframe) {
+        sources.push({ tag: stream.source_tag || stream.tag || 'Default', url: stream.iframe });
+      }
+
+      for (const sub of stream.substreams || []) {
+        if (sub.iframe && sub.source_tag) {
+          sources.push({ tag: sub.source_tag, url: sub.iframe });
+        }
+      }
+
+      if (sources.length === 0) continue;
 
       channels.push({
         name: stream.name,
         group: `En Vivo · ${category.category}`,
         type: 'embed',
-        url: stream.iframe,
+        url: sources[0].url,
         poster: stream.poster,
+        sources: sources.length > 1 ? sources : undefined,
       });
     }
   }

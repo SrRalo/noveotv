@@ -10,6 +10,8 @@ export interface Channel {
   url: string;
   poster?: string;
   sources?: StreamSource[];
+  startsAt?: number;
+  endsAt?: number;
 }
 
 export interface ChannelsResponse {

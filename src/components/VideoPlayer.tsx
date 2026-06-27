@@ -4,10 +4,11 @@ import type { Channel } from '../types';
 
 interface Props {
   channel: Channel | null;
+  videoRef?: React.RefObject<HTMLVideoElement | null>;
 }
 
-export function VideoPlayer({ channel }: Props) {
-  const videoRef = useRef<HTMLVideoElement>(null);
+export function VideoPlayer({ channel, videoRef: externalVideoRef }: Props) {
+  const internalVideoRef = useRef<HTMLVideoElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const [error, setError] = useState(false);
@@ -15,15 +16,17 @@ export function VideoPlayer({ channel }: Props) {
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [sourceIndex, setSourceIndex] = useState(0);
 
+  const videoEl = externalVideoRef || internalVideoRef;
   const effectiveUrl = channel?.sources?.[sourceIndex]?.url ?? channel?.url ?? '';
 
   useEffect(() => {
     setSourceIndex(0);
+    setError(false);
   }, [channel?.url]);
 
   useEffect(() => {
     if (!channel || channel.type === 'embed') return;
-    const video = videoRef.current;
+    const video = videoEl.current;
     if (!video) return;
 
     setError(false);
@@ -56,7 +59,41 @@ export function VideoPlayer({ channel }: Props) {
       if (hls) hls.destroy();
       video.src = '';
     };
-  }, [channel, effectiveUrl]);
+  }, [channel, effectiveUrl, videoEl]);
+
+  const retry = useCallback(() => {
+    setError(false);
+    setLoading(true);
+    const video = videoEl.current;
+    if (!video) return;
+    let hls: Hls | null = null;
+
+    if (Hls.isSupported()) {
+      hls = new Hls();
+      hls.loadSource(effectiveUrl);
+      hls.attachMedia(video);
+      hls.on(Hls.Events.ERROR, (_event, data) => {
+        if (data.fatal) {
+          setError(true);
+          setLoading(false);
+        }
+      });
+      hls.on(Hls.Events.MANIFEST_PARSED, () => {
+        setLoading(false);
+        video.play().catch(() => {});
+      });
+    } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
+      video.src = effectiveUrl;
+      setLoading(false);
+    } else {
+      setError(true);
+      setLoading(false);
+    }
+
+    return () => {
+      if (hls) hls.destroy();
+    };
+  }, [effectiveUrl, videoEl]);
 
   const toggleFullscreen = useCallback(() => {
     const el = containerRef.current;
@@ -77,8 +114,14 @@ export function VideoPlayer({ channel }: Props) {
   if (!channel) {
     return (
       <div className="relative bg-black rounded-xl overflow-hidden shadow-lg aspect-video">
-        <div className="flex items-center justify-center h-full text-gray-500">
-          <p className="text-xl">Selecciona un canal para reproducir</p>
+        <div className="flex items-center justify-center h-full text-gray-400">
+          <div className="text-center">
+            <svg className="w-16 h-16 mx-auto mb-3 opacity-40" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
+            </svg>
+            <p className="text-lg">Selecciona un canal</p>
+            <p className="text-sm mt-1 opacity-60">Usa las flechas ↑ ↓ y Enter</p>
+          </div>
         </div>
       </div>
     );
@@ -100,7 +143,7 @@ export function VideoPlayer({ channel }: Props) {
           <button
             onClick={toggleFullscreen}
             className="absolute bottom-4 right-4 p-2 rounded-lg bg-black/50 hover:bg-black/70 text-white transition-opacity opacity-0 group-hover:opacity-100 cursor-pointer"
-            title="Pantalla completa"
+            title="Pantalla completa (F)"
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               {isFullscreen ? (
@@ -140,7 +183,7 @@ export function VideoPlayer({ channel }: Props) {
   return (
     <div ref={containerRef} className="relative bg-black rounded-xl overflow-hidden shadow-lg aspect-video group">
       <video
-        ref={videoRef}
+        ref={videoEl}
         key={sourceIndex}
         controls
         autoPlay
@@ -155,18 +198,24 @@ export function VideoPlayer({ channel }: Props) {
       )}
 
       {error && (
-        <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/80 gap-2">
+        <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/80 gap-3">
           <svg className="w-12 h-12 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
           </svg>
           <p className="text-gray-400 text-sm">Señal no disponible</p>
+          <button
+            onClick={retry}
+            className="px-4 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white text-sm rounded-lg transition-colors cursor-pointer"
+          >
+            Reintentar
+          </button>
         </div>
       )}
 
       <button
         onClick={toggleFullscreen}
         className="absolute bottom-4 right-4 p-2 rounded-lg bg-black/50 hover:bg-black/70 text-white transition-opacity opacity-0 group-hover:opacity-100 cursor-pointer"
-        title="Pantalla completa"
+        title="Pantalla completa (F)"
       >
         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           {isFullscreen ? (

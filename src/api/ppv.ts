@@ -41,6 +41,8 @@ export async function fetchPpvStreams(): Promise<Channel[]> {
         url: sources[0].url,
         poster: stream.poster,
         sources: sources.length > 1 ? sources : undefined,
+        startsAt: stream.starts_at,
+        endsAt: stream.ends_at,
       });
     }
   }

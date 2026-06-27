@@ -14,12 +14,16 @@ export default defineConfig({
       closeBundle() {
         const dist = path.resolve(__dirname, 'dist')
         const html = fs.readFileSync(path.join(dist, 'index.html'), 'utf-8')
-        fs.writeFileSync(
-          path.join(dist, 'index.html'),
-          html
-            .replace(/\s*crossorigin/g, '')
-            .replace(/<script type="module"/g, '<script')
-        )
+        const match = html.match(/<script[^>]*src="[^"]+"[^>]*><\/script>/)
+        if (!match) return
+
+        const scriptTag = match[0].replace(/\s*crossorigin/g, '').replace(' type="module"', '')
+        const clean = html
+          .replace(match[0], '')
+          .replace(/\s*crossorigin/g, '')
+          .replace('</body>', `${scriptTag}\n</body>`)
+
+        fs.writeFileSync(path.join(dist, 'index.html'), clean)
       },
     },
   ],

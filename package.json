@@ -11,12 +11,14 @@
     "dev:all": "concurrently \"npm run server\" \"npm run dev\""
   },
   "dependencies": {
+    "@vitejs/plugin-legacy": "^6.1.1",
     "cors": "^2.8.5",
     "express": "^5.1.0",
     "hls.js": "^1.5.0",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
-    "tailwindcss": "^3.4.19"
+    "tailwindcss": "^3.4.19",
+    "terser": "^5.48.0"
   },
   "devDependencies": {
     "@types/react": "^19.1.2",

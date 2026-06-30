@@ -1,10 +1,9 @@
 import type { Channel, PpvResponse, StreamSource } from '../types';
 
-const BASE_URL = 'https://api.ppv.to';
 const TARGET_CATEGORY = 'Football';
 
 export async function fetchPpvStreams(): Promise<Channel[]> {
-  const res = await fetch(`${BASE_URL}/api/streams`);
+  const res = await fetch('/api/ppv');
   if (!res.ok) return [];
   const data: PpvResponse = await res.json();
   if (!data.success) return [];

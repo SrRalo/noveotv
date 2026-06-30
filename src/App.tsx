@@ -15,7 +15,6 @@ export default function App() {
   const [isMultiView, setIsMultiView] = useState(false);
   const [slots, setSlots] = useState<(Channel | null)[]>(Array(MAX_SLOTS).fill(null));
   const [sidebarOpen, setSidebarOpen] = useState(true);
-  const [mobileSidebar, setMobileSidebar] = useState(false);
   const [search, setSearch] = useState('');
   const searchRef = useRef<HTMLInputElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -26,9 +25,7 @@ export default function App() {
 
   useEffect(() => {
     const onResize = () => {
-      const mobile = window.innerWidth < 768;
-      setIsMobile(mobile);
-      if (!mobile) setMobileSidebar(false);
+      setIsMobile(window.innerWidth < 768);
     };
     window.addEventListener('resize', onResize);
     return () => window.removeEventListener('resize', onResize);
@@ -37,7 +34,6 @@ export default function App() {
   const handleChannelSelect = useCallback((ch: Channel) => {
     if (!isMultiView) {
       setCurrentChannel(ch);
-      if (isMobile) setMobileSidebar(false);
       return;
     }
     setSlots((prev) => {
@@ -53,7 +49,7 @@ export default function App() {
       next[empty] = ch;
       return next;
     });
-  }, [isMultiView, isMobile]);
+  }, [isMultiView]);
 
   const toggleMultiView = useCallback(() => {
     if (!isMultiView) {
@@ -121,14 +117,13 @@ export default function App() {
           toggleMultiView();
           break;
         case 'Escape':
-          if (mobileSidebar) setMobileSidebar(false);
           break;
       }
     };
 
     window.addEventListener('keydown', onKeyDown);
     return () => window.removeEventListener('keydown', onKeyDown);
-  }, [visibleChannels, selectedIndex, handleChannelSelect, toggleMultiView, mobileSidebar]);
+  }, [visibleChannels, selectedIndex, handleChannelSelect, toggleMultiView]);
 
   return (
     <div className="h-screen flex flex-col bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 transition-colors">
@@ -152,17 +147,6 @@ export default function App() {
           </h1>
         </div>
         <div className="flex items-center gap-2 md:gap-3">
-          {!sidebarOpen && (
-            <button
-              onClick={() => { if (isMobile) setMobileSidebar(true); else setSidebarOpen(true); }}
-              className="md:hidden p-2 rounded-lg bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors cursor-pointer"
-              title="Mostrar lista"
-            >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-              </svg>
-            </button>
-          )}
           <button
             onClick={toggleMultiView}
             className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors cursor-pointer ${
@@ -239,69 +223,7 @@ export default function App() {
         </aside>
         )}
 
-        {/* Sidebar móvil (overlay) */}
-        {isMobile && mobileSidebar && (
-          <>
-            <div
-              className="fixed inset-0 bg-black/50 z-40"
-              onClick={() => setMobileSidebar(false)}
-            />
-            <aside className="fixed inset-y-0 left-0 w-80 z-50 bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-700 flex flex-col shadow-2xl">
-              <div className="flex items-center justify-between px-4 py-3 border-b border-gray-200 dark:border-gray-700">
-                <h2 className="font-semibold text-sm">Canales</h2>
-                <button
-                  onClick={() => setMobileSidebar(false)}
-                  className="p-1 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors cursor-pointer"
-                >
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                  </svg>
-                </button>
-              </div>
-              <div className="p-3 border-b border-gray-200 dark:border-gray-700">
-                <CategoryFilter
-                  groups={groups}
-                  selected={selectedGroup}
-                  onSelect={(g) => { setSelectedGroup(g); }}
-                  counts={channelsWithCounts}
-                />
-              </div>
-              <div className="px-3 pt-3 pb-1">
-                <div className="relative">
-                  <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                  </svg>
-                  <input
-                    type="text"
-                    value={search}
-                    onChange={(e) => setSearch(e.target.value)}
-                    placeholder="Buscar canales..."
-                    className="w-full pl-9 pr-3 py-2 text-sm rounded-lg bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 placeholder-gray-400"
-                  />
-                </div>
-              </div>
-              {isMultiView && (
-                <div className="grid grid-cols-2 gap-1 p-2 border-b border-gray-200 dark:border-gray-700">
-                  {slots.map((s, i) => (
-                    <div key={i} className={`text-[11px] font-medium px-2 py-1 rounded text-center truncate ${s ? `${SLOT_COLORS[i]} text-white` : 'bg-gray-100 dark:bg-gray-800 text-gray-400'}`} title={s?.name}>
-                      {s ? s.name : `Slot ${i + 1}`}
-                    </div>
-                  ))}
-                </div>
-              )}
-              <div className="flex-1 overflow-y-auto p-3">
-                <ChannelList
-                  channels={visibleChannels}
-                  selected={isMultiView ? null : currentChannel}
-                  onSelect={handleChannelSelect}
-                  loading={loading}
-                  slots={isMultiView ? slots : undefined}
-                  search={search}
-                />
-              </div>
-            </aside>
-          </>
-        )}
+
 
         <main className="flex-1 flex flex-col p-3 md:p-4 gap-3 md:gap-4 overflow-y-auto">
           {isMultiView ? (
@@ -328,6 +250,49 @@ export default function App() {
                 </div>
               )}
             </>
+          )}
+
+          {/* Lista de canales en móvil debajo del reproductor */}
+          {isMobile && (
+            <div className="border-t border-gray-200 dark:border-gray-700 pt-3 md:hidden">
+              <div className="mb-3">
+                <CategoryFilter
+                  groups={groups}
+                  selected={selectedGroup}
+                  onSelect={setSelectedGroup}
+                  counts={channelsWithCounts}
+                />
+              </div>
+              <div className="relative mb-3">
+                <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                </svg>
+                <input
+                  type="text"
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                  placeholder="Buscar canales..."
+                  className="w-full pl-9 pr-3 py-2 text-sm rounded-lg bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 placeholder-gray-400"
+                />
+              </div>
+              {isMultiView && (
+                <div className="grid grid-cols-2 gap-1 mb-3 border-b border-gray-200 dark:border-gray-700 pb-3">
+                  {slots.map((s, i) => (
+                    <div key={i} className={`text-[11px] font-medium px-2 py-1 rounded text-center truncate ${s ? `${SLOT_COLORS[i]} text-white` : 'bg-gray-100 dark:bg-gray-800 text-gray-400'}`} title={s?.name}>
+                      {s ? s.name : `Slot ${i + 1}`}
+                    </div>
+                  ))}
+                </div>
+              )}
+              <ChannelList
+                channels={visibleChannels}
+                selected={isMultiView ? null : currentChannel}
+                onSelect={handleChannelSelect}
+                loading={loading}
+                slots={isMultiView ? slots : undefined}
+                search={search}
+              />
+            </div>
           )}
         </main>
       </div>

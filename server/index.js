@@ -50,6 +50,19 @@ app.get('/api/channels', (req, res) => {
   res.json({ channels: result, groups });
 });
 
+app.get('/api/ppv', async (req, res) => {
+  try {
+    const response = await fetch('http://api.ppv.to/api/streams');
+    if (!response.ok) {
+      return res.status(response.status).json({ success: false });
+    }
+    const data = await response.json();
+    res.json(data);
+  } catch {
+    res.status(502).json({ success: false });
+  }
+});
+
 app.listen(PORT, () => {
   console.log(`NoveoTV API running on http://localhost:${PORT}`);
 });

@@ -6,9 +6,47 @@ import { useShakaPlayer } from '../hooks/useShakaPlayer';
 interface Props {
   channel: Channel | null;
   videoRef?: React.RefObject<HTMLVideoElement | null>;
+  compact?: boolean;
 }
 
-export function VideoPlayer({ channel, videoRef: externalVideoRef }: Props) {
+interface SourcePickerProps {
+  sources?: { tag: string; url: string }[];
+  active: number;
+  onSelect: (index: number) => void;
+  compact?: boolean;
+}
+
+function SourcePicker({ sources, active, onSelect, compact }: SourcePickerProps) {
+  if (!sources || sources.length < 2) return null;
+
+  return (
+    <div className={`flex flex-wrap items-center gap-1.5 ${compact ? 'mt-1' : 'mt-3'}`}>
+      {!compact && (
+        <span className="text-sm font-medium text-gray-500 dark:text-gray-400 whitespace-nowrap">
+          Opciones:
+        </span>
+      )}
+      {sources.map((source, i) => (
+        <button
+          key={`${source.tag}-${source.url}`}
+          onClick={() => onSelect(i)}
+          aria-label={`Reproducir ${source.tag}`}
+          aria-pressed={i === active}
+          title={source.url}
+          className={`px-3 py-1 rounded-md text-xs font-medium transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2 ${
+            i === active
+              ? 'bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-md shadow-indigo-500/20'
+              : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600'
+          }`}
+        >
+          {source.tag}
+        </button>
+      ))}
+    </div>
+  );
+}
+
+export function VideoPlayer({ channel, videoRef: externalVideoRef, compact }: Props) {
   const internalVideoRef = useRef<HTMLVideoElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const iframeRef = useRef<HTMLIFrameElement>(null);
@@ -111,34 +149,18 @@ export function VideoPlayer({ channel, videoRef: externalVideoRef }: Props) {
             </svg>
           </button>
         </div>
-        {channel.sources && channel.sources.length > 1 && (
-          <div className="flex items-center gap-2 mt-3">
-            <label className="text-sm font-medium text-gray-500 dark:text-gray-400 whitespace-nowrap">
-              Fuente:
-            </label>
-            <div className="flex flex-wrap gap-1.5">
-              {channel.sources.map((s, i) => (
-                <button
-                  key={i}
-                  onClick={() => setSourceIndex(i)}
-                  aria-label={`Seleccionar fuente ${s.tag}`}
-                  className={`px-3 py-1 rounded-md text-xs font-medium transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2 ${
-                    i === sourceIndex
-                      ? 'bg-indigo-600 text-white'
-                      : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600'
-                  }`}
-                >
-                  {s.tag}
-                </button>
-              ))}
-            </div>
-          </div>
-        )}
+        <SourcePicker
+          sources={channel.sources}
+          active={sourceIndex}
+          onSelect={setSourceIndex}
+          compact={compact}
+        />
       </>
     );
   }
 
   return (
+    <>
     <div ref={containerRef} className="relative bg-black rounded-xl overflow-hidden shadow-lg aspect-video group">
       <video
         ref={videoEl}
@@ -193,5 +215,12 @@ export function VideoPlayer({ channel, videoRef: externalVideoRef }: Props) {
         </svg>
       </button>
     </div>
+      <SourcePicker
+        sources={channel.sources}
+        active={sourceIndex}
+        onSelect={setSourceIndex}
+        compact={compact}
+      />
+    </>
   );
 }

@@ -245,12 +245,31 @@ app.get('/api/channels', (req, res) => {
 
   const channels = [];
   let current = null;
+  let urls = [];
+
+  const flush = () => {
+    if (current && urls.length > 0) {
+      const [url, ...rest] = urls;
+      const channel = { ...current, url };
+      if (rest.length > 0) {
+        channel.sources = urls.map((sourceUrl, i) => ({ tag: `Opción ${i + 1}`, url: sourceUrl }));
+      }
+      channels.push(channel);
+    }
+    current = null;
+    urls = [];
+  };
 
   for (const line of lines) {
     const trimmed = line.trim();
-    if (!trimmed || trimmed === '#EXTM3U') continue;
+
+    if (!trimmed || trimmed === '#EXTM3U') {
+      flush();
+      continue;
+    }
 
     if (trimmed.startsWith('#EXTINF:')) {
+      flush();
       const groupMatch = trimmed.match(/group-title="([^"]+)"/);
       const nameMatch = trimmed.match(/,(.+)$/);
       const embedMatch = trimmed.match(/tve-embed="true"/);
@@ -259,20 +278,21 @@ app.get('/api/channels', (req, res) => {
         name: nameMatch ? nameMatch[1].trim() : 'Unknown',
         group: groupMatch ? groupMatch[1] : 'Sin categoría',
         type: embedMatch ? 'embed' : tsMatch ? 'ts' : 'hls',
-        url: '',
       };
-    } else if (current && (trimmed.startsWith('http') || trimmed.startsWith('/proxy/') || trimmed.startsWith('/hls/'))) {
-      current.url = trimmed;
+      continue;
+    }
+
+    if (current && (trimmed.startsWith('http') || trimmed.startsWith('/proxy/') || trimmed.startsWith('/hls/'))) {
+      urls.push(trimmed);
       if (trimmed.startsWith('/proxy/espn/')) {
         current.type = 'ts';
-      }
-      if (trimmed.startsWith('/hls/')) {
+      } else if (trimmed.startsWith('/hls/')) {
         current.type = 'hls';
       }
-      channels.push(current);
-      current = null;
     }
   }
+
+  flush();
 
   const { group } = req.query;
   let result = channels;

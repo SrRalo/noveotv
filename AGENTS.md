@@ -68,6 +68,7 @@ npm run preview      # Preview production build
 - **Responsive**: Mobile layout moves sidebar below player
 - **TypeScript strict mode** enabled but `noUnusedLocals`/`noUnusedParameters` disabled
 - **No comments** in code unless explicitly requested
+- **Multi-fuente**: varias URLs de stream en líneas consecutivas bajo un mismo `#EXTINF` se parsean como `sources`; el reproductor muestra botones "Opción N" y la lista un badge "N opc."
 
 ## Deployment
 - Vercel with rewrites: `/api/*` → serverless functions, `/*` → `index.html`

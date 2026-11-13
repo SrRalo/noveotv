@@ -3,41 +3,76 @@ import type { Channel, ChannelsResponse } from '../types';
 function parseM3U(content: string): ChannelsResponse {
   const lines = content.split('\n');
   const channels: Channel[] = [];
-  let current: Partial<Channel> | null = null;
+  let pending: Partial<Channel> | null = null;
+  let urls: string[] = [];
+
+  const flush = () => {
+    if (pending && urls.length > 0) {
+      const [url, ...rest] = urls;
+      const channel: Channel = {
+        name: pending.name ?? 'Unknown',
+        group: pending.group ?? 'Sin categoría',
+        type: pending.type ?? 'hls',
+        url,
+      };
+      if (rest.length > 0) {
+        channel.sources = urls.map((sourceUrl, i) => ({ tag: `Opción ${i + 1}`, url: sourceUrl }));
+      }
+      channels.push(channel);
+    }
+    pending = null;
+    urls = [];
+  };
 
   for (const line of lines) {
     const trimmed = line.trim();
-    if (!trimmed || trimmed === '#EXTM3U') continue;
+
+    if (!trimmed || trimmed === '#EXTM3U') {
+      flush();
+      continue;
+    }
 
     if (trimmed.startsWith('#EXTINF:')) {
+      flush();
       const groupMatch = trimmed.match(/group-title="([^"]+)"/);
       const nameMatch = trimmed.match(/,(.+)$/);
       const embedMatch = trimmed.match(/tve-embed="true"/);
       const tsMatch = trimmed.match(/tve-ts="true"/);
-      current = {
+      pending = {
         name: nameMatch ? nameMatch[1].trim() : 'Unknown',
         group: groupMatch ? groupMatch[1] : 'Sin categoría',
         type: embedMatch ? 'embed' : tsMatch ? 'ts' : 'hls',
-        url: '',
       };
-    } else if (current && (trimmed.startsWith('http') || trimmed.startsWith('/proxy/'))) {
-      current.url = trimmed;
+      continue;
+    }
+
+    if (pending && (trimmed.startsWith('http') || trimmed.startsWith('/proxy/') || trimmed.startsWith('/hls/'))) {
+      urls.push(trimmed);
       if (trimmed.startsWith('/proxy/espn/')) {
-        current.type = 'ts';
+        pending.type = 'ts';
+      } else if (trimmed.startsWith('/hls/')) {
+        pending.type = 'hls';
       }
-      channels.push(current as Channel);
-      current = null;
     }
   }
+
+  flush();
 
   const groups = [...new Set(channels.map((c) => c.group))];
   return { channels, groups };
 }
 
+function proxifyUrl(url: string): string {
+  if (!url.startsWith('http://')) return url;
+  if (typeof window === 'undefined' || window.location.protocol !== 'https:') return url;
+  return `/api/proxy?url=${encodeURIComponent(url)}`;
+}
+
 function proxify(channel: Channel): Channel {
-  if (!channel.url.startsWith('http://')) return channel;
-  if (typeof window === 'undefined' || window.location.protocol !== 'https:') return channel;
-  return { ...channel, url: `/api/proxy?url=${encodeURIComponent(channel.url)}` };
+  const url = proxifyUrl(channel.url);
+  const sources = channel.sources?.map((s) => ({ tag: s.tag, url: proxifyUrl(s.url) }));
+  if (url === channel.url && !sources) return channel;
+  return { ...channel, url, ...(sources ? { sources } : {}) };
 }
 
 function proxifyAll(response: ChannelsResponse): ChannelsResponse {

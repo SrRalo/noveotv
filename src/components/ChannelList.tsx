@@ -116,6 +116,16 @@ export function ChannelList({ channels, selected, onSelect, loading, slots, sear
                     HLS
                   </span>
                 )}
+                {ch.sources && ch.sources.length > 1 && (
+                  <span
+                    title={`${ch.sources.length} opciones de reproducción`}
+                    className={`text-[10px] font-semibold px-1 py-0.5 rounded shrink-0 ${
+                      isSelected ? 'bg-white/20 text-white' : 'bg-amber-100 dark:bg-amber-900/50 text-amber-600 dark:text-amber-400'
+                    }`}
+                  >
+                    {ch.sources.length} opc.
+                  </span>
+                )}
               </div>
               <div className="flex items-center gap-2">
                 <span className={`text-xs ${isSelected ? 'text-white/70' : 'opacity-60'}`}>

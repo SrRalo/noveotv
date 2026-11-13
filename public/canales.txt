@@ -2,18 +2,22 @@
 
 #EXTINF:-1 group-title="Nacionales (Ecuador)",Ecuavisa GYE
 https://dai.google.com/linear/hls/event/GyPkTVDZSXGhpOvxPK7m2g/master.m3u8
+http://45.224.97.181:9999/Ecuavisa/index.m3u8
 
 #EXTINF:-1 group-title="Nacionales (Ecuador)",Ecuavisa UIO
 https://redirector.dps.live/hls-video/c54ac2799874375c81c1672abb700870537c5223/ecuavisa/ecuavisa.smil/playlist.m3u8
 
 #EXTINF:-1 group-title="Nacionales (Ecuador)",Teleamazonas
 http://45.224.97.181:9999/Teleamazonas/index.m3u8
+http://157.100.248.242:8080/TeleamazonasHD/index.m3u8
 
 #EXTINF:-1 group-title="Nacionales (Ecuador)",OROMAR
 https://stream.oromar.tv/hls/oromartv_hi/index.m3u8
+http://45.224.97.181:9999/Oromar/index.m3u8
 
 #EXTINF:-1 group-title="Nacionales (Ecuador)",RTS
-https://d2qsan2ut81n2k.cloudfront.net/live/72a3661e-1019-45f8-af10-af59f6ef6222/ts:abr.m3u8
+http://45.224.97.181:9999/RTS/index.m3u8
+http://157.100.248.242:8080/RTSHD/index.m3u8
 
 #EXTINF:-1 group-title="Deportes",FIFA 1
 https://6c849fb3.wurl.com/master/f36d25e7e52f1ba8d7e56eb859c636563214f541/TEctbXhfRklGQVBsdXNTcGFuaXNoLTFfSExT/playlist.m3u8
@@ -72,7 +76,9 @@ https://sv72.ecuaradiotv.net/lanuevatv/live/playlist.m3u8
 https://stmv1.voxtvhd.com.br/latacungatv/latacungatv/playlist.m3u8
 
 #EXTINF:-1 group-title="Entretenimiento",MakroDigital Television
+https://makrodigitaltv.makrodigital.com/makrodigitaltelevision/iptv/playlist.m3u8
 http://iptv.makrodigitaltv.makrodigital.com:8081/makrodigitaltelevision/iptv/playlist.m3u8
+http://205.235.6.29:8000/play/a0wp/index.m3u8
 
 #EXTINF:-1 group-title="Gobierno",TV Legislativa
 https://streamingav.asambleanacional.gob.ec/hls/stream.m3u8
@@ -121,9 +127,11 @@ https://stmv3.voxtvhd.com.br/australtv/australtv/playlist.m3u8
 
 #EXTINF:-1 group-title="Nacionales (Ecuador)",Ecuador TV
 http://45.224.97.181:9999/EcuadorTV/index.m3u8
+https://video-eu1.streamerr.co/hls/s64029a8fdf/live.m3u8
 
 #EXTINF:-1 group-title="Nacionales (Ecuador)",Gamavision
 http://45.224.97.181:9999/Gamavision/index.m3u8
+http://181.78.211.244:8000/play/a0a2/index.m3u8
 
 #EXTINF:-1 group-title="Nacionales (Ecuador)",Hechos Ecuador
 https://online.hechosecuador.com:5443/WebRTCApp/streams/hechosecuador.m3u8
@@ -160,6 +168,7 @@ https://live.obslivestream.com/sonoondatv/index.m3u8
 
 #EXTINF:-1 group-title="Nacionales (Ecuador)",TC Television
 http://45.224.97.181:9999/TC/index.m3u8
+http://177.234.218.66:8084/play/a089/index.m3u8
 
 #EXTINF:-1 group-title="Nacionales (Ecuador)",Telemar
 https://cloudpro.servidoresdestream.com:8081/8020/index.m3u8
@@ -172,6 +181,7 @@ https://video.compuwebecuador.com:3067/live/tvcolorlive.m3u8
 
 #EXTINF:-1 group-title="Nacionales (Ecuador)",TVC
 http://45.224.97.181:9999/TVC/index.m3u8
+http://157.100.248.242:8080/TVCHD/index.m3u8
 
 #EXTINF:-1 group-title="Nacionales (Ecuador)",TvOro
 http://45.187.0.19:9090/tvusa/index.m3u8

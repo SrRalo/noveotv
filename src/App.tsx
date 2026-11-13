@@ -253,7 +253,7 @@ export default function App() {
             <div className="grid grid-cols-2 gap-3 md:gap-4 flex-1 content-start">
               {slots.map((s, i) => (
                 <div key={i} className="flex flex-col gap-1">
-                  <VideoPlayer channel={s} />
+                  <VideoPlayer channel={s} compact />
                   {s && (
                     <p className="text-xs text-center text-gray-500 dark:text-gray-400 font-medium truncate px-1">
                       <span className={`inline-block w-2 h-2 rounded-full ${SLOT_COLORS[i]} mr-1`} />

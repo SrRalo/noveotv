@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
-import Hls from 'hls.js';
 import type { Channel } from '../types';
+import { useHlsPlayer } from '../hooks/useHlsPlayer';
+import { useShakaPlayer } from '../hooks/useShakaPlayer';
 
 interface Props {
   channel: Channel | null;
@@ -11,89 +12,31 @@ export function VideoPlayer({ channel, videoRef: externalVideoRef }: Props) {
   const internalVideoRef = useRef<HTMLVideoElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const iframeRef = useRef<HTMLIFrameElement>(null);
-  const [error, setError] = useState(false);
-  const [loading, setLoading] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [sourceIndex, setSourceIndex] = useState(0);
 
   const videoEl = externalVideoRef || internalVideoRef;
   const effectiveUrl = channel?.sources?.[sourceIndex]?.url ?? channel?.url ?? '';
 
+  const isTs = channel?.type === 'ts';
+
+  const hlsResult = useHlsPlayer({
+    videoRef: videoEl,
+    url: !isTs && channel?.type !== 'embed' ? effectiveUrl : '',
+    autoPlay: true,
+  });
+
+  const shakaResult = useShakaPlayer({
+    videoRef: videoEl,
+    url: isTs ? effectiveUrl : '',
+    autoPlay: true,
+  });
+
+  const { error, loading, retry } = isTs ? shakaResult : hlsResult;
+
   useEffect(() => {
     setSourceIndex(0);
-    setError(false);
-  }, [channel?.url]);
-
-  useEffect(() => {
-    if (!channel || channel.type === 'embed') return;
-    const video = videoEl.current;
-    if (!video) return;
-
-    setError(false);
-    setLoading(true);
-    let hls: Hls | null = null;
-
-    if (Hls.isSupported()) {
-      hls = new Hls();
-      hls.loadSource(effectiveUrl);
-      hls.attachMedia(video);
-      hls.on(Hls.Events.ERROR, (_event, data) => {
-        if (data.fatal) {
-          setError(true);
-          setLoading(false);
-        }
-      });
-      hls.on(Hls.Events.MANIFEST_PARSED, () => {
-        setLoading(false);
-        video.play().catch(() => {});
-      });
-    } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
-      video.src = effectiveUrl;
-      setLoading(false);
-    } else {
-      setError(true);
-      setLoading(false);
-    }
-
-    return () => {
-      if (hls) hls.destroy();
-      video.src = '';
-    };
-  }, [channel, effectiveUrl, videoEl]);
-
-  const retry = useCallback(() => {
-    setError(false);
-    setLoading(true);
-    const video = videoEl.current;
-    if (!video) return;
-    let hls: Hls | null = null;
-
-    if (Hls.isSupported()) {
-      hls = new Hls();
-      hls.loadSource(effectiveUrl);
-      hls.attachMedia(video);
-      hls.on(Hls.Events.ERROR, (_event, data) => {
-        if (data.fatal) {
-          setError(true);
-          setLoading(false);
-        }
-      });
-      hls.on(Hls.Events.MANIFEST_PARSED, () => {
-        setLoading(false);
-        video.play().catch(() => {});
-      });
-    } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
-      video.src = effectiveUrl;
-      setLoading(false);
-    } else {
-      setError(true);
-      setLoading(false);
-    }
-
-    return () => {
-      if (hls) hls.destroy();
-    };
-  }, [effectiveUrl, videoEl]);
+  }, [channel?.id, channel?.url]);
 
   const toggleFullscreen = useCallback(() => {
     const el = containerRef.current;
@@ -113,14 +56,27 @@ export function VideoPlayer({ channel, videoRef: externalVideoRef }: Props) {
 
   if (!channel) {
     return (
-      <div className="relative bg-black rounded-xl overflow-hidden shadow-lg aspect-video">
-        <div className="flex items-center justify-center h-full text-gray-400">
-          <div className="text-center">
-            <svg className="w-16 h-16 mx-auto mb-3 opacity-40" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
-            </svg>
-            <p className="text-lg">Selecciona un canal</p>
-            <p className="text-sm mt-1 opacity-60">Usa las flechas ↑ ↓ y Enter</p>
+      <div className="relative bg-gradient-to-br from-gray-900 via-gray-800 to-indigo-900 rounded-xl overflow-hidden shadow-lg aspect-video">
+        <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+        <div className="relative flex items-center justify-center h-full">
+          <div className="text-center px-6">
+            <div className="w-20 h-20 mx-auto mb-4 bg-indigo-500/20 rounded-full flex items-center justify-center backdrop-blur-sm border border-indigo-500/30">
+              <svg className="w-10 h-10 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
+              </svg>
+            </div>
+            <h2 className="text-xl font-bold text-white mb-2">Selecciona un canal</h2>
+            <p className="text-sm text-gray-300 mb-4">Navega la lista y reproduce tu contenido favorito</p>
+            <div className="flex items-center justify-center gap-4 text-xs text-gray-400">
+              <span className="flex items-center gap-1">
+                <kbd className="px-1.5 py-0.5 bg-white/10 rounded">↑↓</kbd>
+                Navegar
+              </span>
+              <span className="flex items-center gap-1">
+                <kbd className="px-1.5 py-0.5 bg-white/10 rounded">Enter</kbd>
+                Seleccionar
+              </span>
+            </div>
           </div>
         </div>
       </div>
@@ -142,7 +98,8 @@ export function VideoPlayer({ channel, videoRef: externalVideoRef }: Props) {
           />
           <button
             onClick={toggleFullscreen}
-            className="absolute bottom-4 right-4 p-2 rounded-lg bg-black/50 hover:bg-black/70 text-white transition-opacity opacity-0 group-hover:opacity-100 cursor-pointer"
+            aria-label={isFullscreen ? 'Salir de pantalla completa' : 'Entrar en pantalla completa'}
+            className="absolute bottom-4 right-4 p-2 rounded-lg bg-black/50 hover:bg-black/70 text-white transition-opacity opacity-0 group-hover:opacity-100 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:opacity-100"
             title="Pantalla completa (F)"
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -164,7 +121,8 @@ export function VideoPlayer({ channel, videoRef: externalVideoRef }: Props) {
                 <button
                   key={i}
                   onClick={() => setSourceIndex(i)}
-                  className={`px-3 py-1 rounded-md text-xs font-medium transition-colors cursor-pointer ${
+                  aria-label={`Seleccionar fuente ${s.tag}`}
+                  className={`px-3 py-1 rounded-md text-xs font-medium transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2 ${
                     i === sourceIndex
                       ? 'bg-indigo-600 text-white'
                       : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600'
@@ -192,20 +150,29 @@ export function VideoPlayer({ channel, videoRef: externalVideoRef }: Props) {
       />
 
       {loading && (
-        <div className="absolute inset-0 flex items-center justify-center bg-black/60">
-          <div className="w-10 h-10 border-4 border-indigo-500 border-t-transparent rounded-full animate-spin" />
+        <div className="absolute inset-0 flex items-center justify-center bg-black/60 backdrop-blur-sm">
+          <div className="flex flex-col items-center gap-3">
+            <div className="w-12 h-12 border-4 border-indigo-500/30 border-t-indigo-500 rounded-full animate-spin" />
+            <p className="text-sm text-gray-300 animate-pulse">Cargando stream...</p>
+          </div>
         </div>
       )}
 
       {error && (
-        <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/80 gap-3">
-          <svg className="w-12 h-12 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
-          </svg>
-          <p className="text-gray-400 text-sm">Señal no disponible</p>
+        <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/80 backdrop-blur-sm gap-4 animate-in fade-in duration-200">
+          <div className="w-16 h-16 bg-red-500/20 rounded-full flex items-center justify-center animate-pulse">
+            <svg className="w-8 h-8 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
+            </svg>
+          </div>
+          <div className="text-center">
+            <p className="text-white font-medium">Señal no disponible</p>
+            <p className="text-gray-400 text-sm mt-1">El stream no está accesible en este momento</p>
+          </div>
           <button
             onClick={retry}
-            className="px-4 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white text-sm rounded-lg transition-colors cursor-pointer"
+            aria-label="Reintentar reproducción"
+            className="px-5 py-2 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white text-sm font-medium rounded-lg transition-all duration-200 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 hover:scale-105 active:scale-95 shadow-lg shadow-indigo-500/25"
           >
             Reintentar
           </button>

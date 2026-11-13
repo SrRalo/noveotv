@@ -4,11 +4,11 @@ export default async function handler(req, res) {
   try {
     const response = await fetch('http://api.ppv.to/api/streams');
     if (!response.ok) {
-      return res.status(response.status).json({ success: false });
+      return res.status(response.status).json({ success: false, streams: [] });
     }
     const data = await response.json();
     res.json(data);
   } catch {
-    res.status(502).json({ success: false });
+    res.status(502).json({ success: false, streams: [] });
   }
 }

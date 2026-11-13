@@ -38,7 +38,11 @@ export function ChannelList({ channels, selected, onSelect, loading, slots, sear
     return (
       <div className="space-y-2">
         {Array.from({ length: 6 }).map((_, i) => (
-          <div key={i} className="h-14 bg-gray-200 dark:bg-gray-700 rounded-lg animate-pulse" />
+          <div 
+            key={i} 
+            className="h-14 bg-gradient-to-r from-gray-200 via-gray-300 to-gray-200 dark:from-gray-700 dark:via-gray-600 dark:to-gray-700 rounded-lg animate-pulse bg-[length:200%_100%] animate-shimmer"
+            style={{ animationDelay: `${i * 100}ms` }}
+          />
         ))}
       </div>
     );
@@ -46,9 +50,19 @@ export function ChannelList({ channels, selected, onSelect, loading, slots, sear
 
   if (filtered.length === 0) {
     return (
-      <p className="text-gray-500 text-center py-8">
-        {search ? 'Sin resultados' : 'No hay canales disponibles'}
-      </p>
+      <div className="text-center py-12 px-4">
+        <div className="w-16 h-16 mx-auto mb-4 bg-gray-100 dark:bg-gray-800 rounded-full flex items-center justify-center">
+          <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+          </svg>
+        </div>
+        <p className="text-gray-600 dark:text-gray-400 font-medium">
+          {search ? 'Sin resultados' : 'No hay canales disponibles'}
+        </p>
+        <p className="text-sm text-gray-500 dark:text-gray-500 mt-1">
+          {search ? `No se encontraron canales para "${search}"` : 'Intenta recargar la página'}
+        </p>
+      </div>
     );
   }
 
@@ -65,10 +79,11 @@ export function ChannelList({ channels, selected, onSelect, loading, slots, sear
           <button
             key={`${ch.name}-${i}`}
             onClick={() => onSelect(ch)}
-            className={`w-full text-left px-3 py-2.5 rounded-lg transition-colors cursor-pointer flex items-center gap-2 ${
+            aria-label={`Seleccionar canal ${ch.name}`}
+            className={`w-full text-left px-3 py-2.5 rounded-lg transition-all duration-200 cursor-pointer flex items-center gap-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2 ${
               isSelected
-                ? 'bg-indigo-600 text-white'
-                : 'bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-700'
+                ? 'bg-gradient-to-r from-indigo-600 to-indigo-500 text-white shadow-lg shadow-indigo-500/25 scale-[1.02]'
+                : 'bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-700 hover:scale-[1.01] hover:shadow-md'
             } ${
               slots && slotIndexes.length > 0
                 ? 'ring-2 ring-indigo-500/50 bg-gray-100 dark:bg-gray-800'

@@ -12,9 +12,10 @@ export function CategoryFilter({ groups, selected, onSelect, counts }: Props) {
     <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-thin">
       <button
         onClick={() => onSelect(null)}
-        className={`flex items-center gap-1.5 px-4 py-1.5 rounded-full text-sm font-medium whitespace-nowrap transition-colors shrink-0 ${
+        aria-label="Mostrar todos los canales"
+        className={`flex items-center gap-1.5 px-4 py-1.5 rounded-full text-sm font-medium whitespace-nowrap transition-all duration-200 shrink-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2 hover:scale-105 active:scale-95 ${
           selected === null
-            ? 'bg-indigo-600 text-white'
+            ? 'bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-lg shadow-indigo-500/25'
             : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600'
         }`}
       >
@@ -34,9 +35,10 @@ export function CategoryFilter({ groups, selected, onSelect, counts }: Props) {
           <button
             key={g}
             onClick={() => onSelect(g)}
-            className={`flex items-center gap-1.5 px-4 py-1.5 rounded-full text-sm font-medium whitespace-nowrap transition-colors shrink-0 ${
+            aria-label={`Filtrar por ${g}`}
+            className={`flex items-center gap-1.5 px-4 py-1.5 rounded-full text-sm font-medium whitespace-nowrap transition-all duration-200 shrink-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2 hover:scale-105 active:scale-95 ${
               selected === g
-                ? 'bg-indigo-600 text-white'
+                ? 'bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-lg shadow-indigo-500/25'
                 : isLive
                   ? 'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300 hover:bg-red-200 dark:hover:bg-red-900/50'
                   : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600'

@@ -34,6 +34,8 @@ export default defineConfig({
   server: {
     proxy: {
       '/api': 'http://localhost:3001',
+      '/proxy': 'http://localhost:3001',
+      '/hls': 'http://localhost:3001',
     },
   },
 })

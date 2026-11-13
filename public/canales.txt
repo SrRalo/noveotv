@@ -44,3 +44,155 @@ http://179.1.87.75:8098/play/a0dk/index.m3u8
 
 #EXTINF:-1 group-title="Entretenimiento",CN
 http://179.1.87.75:8098/play/a0dv/index.m3u8
+
+#EXTM3U-ECUADOR-IPTV-ORG (generado desde https://iptv-org.github.io)
+
+#EXTINF:-1 group-title="Cultura",Ciracu TV
+https://cloud37.ecuatel.com/ciracutv/live/manifest.m3u8
+
+#EXTINF:-1 group-title="Cultura",Manavision
+https://play.once.net.ec/play/Ily2oYdd3E1fi9wK2zORoRovFU9P5xM0g3CNVK2MT0M/.m3u8
+
+#EXTINF:-1 group-title="Educación",Educa TV
+https://avm.ecuamedia.net/educatv/live/playlist.m3u8
+
+#EXTINF:-1 group-title="Educación",UNIANDES TV
+https://video.compuwebecuador.com:3323/live/uniandeslive.m3u8
+
+#EXTINF:-1 group-title="Entretenimiento",Bacan Te Veo
+https://stmv6.voxtvhd.com.br/vacantveo2/vacantveo2/playlist.m3u8
+
+#EXTINF:-1 group-title="Entretenimiento",Gaviota TV
+https://gaviotatv.streamseguro.com:3195/live/gaviotatvlive.m3u8
+
+#EXTINF:-1 group-title="Entretenimiento",La Nueva Radio TV 97.7
+https://sv72.ecuaradiotv.net/lanuevatv/live/playlist.m3u8
+
+#EXTINF:-1 group-title="Entretenimiento",LatacungaTV
+https://stmv1.voxtvhd.com.br/latacungatv/latacungatv/playlist.m3u8
+
+#EXTINF:-1 group-title="Entretenimiento",MakroDigital Television
+http://iptv.makrodigitaltv.makrodigital.com:8081/makrodigitaltelevision/iptv/playlist.m3u8
+
+#EXTINF:-1 group-title="Gobierno",TV Legislativa
+https://streamingav.asambleanacional.gob.ec/hls/stream.m3u8
+
+#EXTINF:-1 group-title="Música",El Sol Network TV
+https://tv.wracanal10.com:3025/live/elsoltvlive.m3u8
+
+#EXTINF:-1 group-title="Música",FM Mundo
+https://video2.makrodigital.com/fmmundo/fmmundo/playlist.m3u8
+
+#EXTINF:-1 group-title="Música",Infinita TV
+https://s2.tvdatta.com:3753/hybrid/play.m3u8
+
+#EXTINF:-1 group-title="Música",Metropoli Medios TV
+https://eu1.servers10.com:8081/8214/index.m3u8
+
+#EXTINF:-1 group-title="Música",Radio Bonita 106.7
+https://cloudvideo.servers10.com:8081/8154/index.m3u8
+
+#EXTINF:-1 group-title="Música",Radio Cuenca Estereo
+https://eu1.servers10.com:8081/8074/index.m3u8
+
+#EXTINF:-1 group-title="Música",Radio Fantastica 98.9 FM
+http://190.107.232.9:8082/livestream/stream.m3u8
+
+#EXTINF:-1 group-title="Música",Radio Monumental TV
+https://cloud37.ecuatel.com/monumentaltv/live/manifest.m3u8
+
+#EXTINF:-1 group-title="Nacionales (Ecuador)",America Estereo Guayaquil
+https://video.makrodigital.com/americaestereoguayaquil/americaestereoguayaquil/playlist.m3u8
+
+#EXTINF:-1 group-title="Nacionales (Ecuador)",America Estereo Ibarra
+https://video.makrodigital.com/americaestereoibarra/americaestereoibarra/playlist.m3u8
+
+#EXTINF:-1 group-title="Nacionales (Ecuador)",America Estereo Quito
+https://video.makrodigital.com/americaestereoquito/americaestereoquito/playlist.m3u8
+
+#EXTINF:-1 group-title="Nacionales (Ecuador)",America Estereo Tulcan
+https://video.makrodigital.com/americaestereotulcan/americaestereotulcan/playlist.m3u8
+
+#EXTINF:-1 group-title="Nacionales (Ecuador)",Antena Uno Radiovideo
+https://tvdatta.com:3578/live/antenaunolive.m3u8
+
+#EXTINF:-1 group-title="Nacionales (Ecuador)",Austral TV
+https://stmv3.voxtvhd.com.br/australtv/australtv/playlist.m3u8
+
+#EXTINF:-1 group-title="Nacionales (Ecuador)",Ecuador TV
+http://45.224.97.181:9999/EcuadorTV/index.m3u8
+
+#EXTINF:-1 group-title="Nacionales (Ecuador)",Gamavision
+http://45.224.97.181:9999/Gamavision/index.m3u8
+
+#EXTINF:-1 group-title="Nacionales (Ecuador)",Hechos Ecuador
+https://online.hechosecuador.com:5443/WebRTCApp/streams/hechosecuador.m3u8
+
+#EXTINF:-1 group-title="Nacionales (Ecuador)",Loreto TV
+https://loretotv.moxapps.shop/live/QFM7KYOlxWd47ybXB3Z1u2P13Py1/index.m3u8
+
+#EXTINF:-1 group-title="Nacionales (Ecuador)",Marca TV
+http://200.7.219.221:8088/live/livetv/index.m3u8
+
+#EXTINF:-1 group-title="Nacionales (Ecuador)",Nuka TV
+https://cloudvideo.servers10.com:8081/8118/index.m3u8
+
+#EXTINF:-1 group-title="Nacionales (Ecuador)",Oromar TV+
+https://stream.oromar.tv/hls/camriva/index.m3u8
+
+#EXTINF:-1 group-title="Nacionales (Ecuador)",Planeta Channel
+https://vs20.live.opencaster.com/planetachannel_089eff6d/index.m3u8
+
+#EXTINF:-1 group-title="Nacionales (Ecuador)",Puruwa TV
+https://live.tvcontrolcp.com:1936/puruwatv/puruwatv/playlist.m3u8
+
+#EXTINF:-1 group-title="Nacionales (Ecuador)",Red TVE Ventanas
+https://s2.tvdatta.com:3825/live/redtvelive.m3u8
+
+#EXTINF:-1 group-title="Nacionales (Ecuador)",RTRTV
+https://tv3ecuador.site/hls/stream/index.m3u8
+
+#EXTINF:-1 group-title="Nacionales (Ecuador)",RTV
+https://sv72.ecuaradiotv.net/rtvhd/live/manifest.m3u8
+
+#EXTINF:-1 group-title="Nacionales (Ecuador)",Sono Onda TV
+https://live.obslivestream.com/sonoondatv/index.m3u8
+
+#EXTINF:-1 group-title="Nacionales (Ecuador)",TC Television
+http://45.224.97.181:9999/TC/index.m3u8
+
+#EXTINF:-1 group-title="Nacionales (Ecuador)",Telemar
+https://cloudpro.servidoresdestream.com:8081/8020/index.m3u8
+
+#EXTINF:-1 group-title="Nacionales (Ecuador)",Telerama
+https://play.once.net.ec/telerama/live.tv/538.m3u8
+
+#EXTINF:-1 group-title="Nacionales (Ecuador)",TV Color Canal 36
+https://video.compuwebecuador.com:3067/live/tvcolorlive.m3u8
+
+#EXTINF:-1 group-title="Nacionales (Ecuador)",TVC
+http://45.224.97.181:9999/TVC/index.m3u8
+
+#EXTINF:-1 group-title="Nacionales (Ecuador)",TvOro
+http://45.187.0.19:9090/tvusa/index.m3u8
+
+#EXTINF:-1 group-title="Nacionales (Ecuador)",Unsion TV
+http://provedores.unsion.tv:8081/srt/1/playlist.m3u8
+
+#EXTINF:-1 group-title="Nacionales (Ecuador)",Wuan+
+https://7.innovatestream.pe:19360/ecuadortest/ecuadortest.m3u8
+
+#EXTINF:-1 group-title="Noticias",Ecotel TV
+https://ecoteltv.streamseguro.com:5443/LiveApp/streams/streaming.m3u8
+
+#EXTINF:-1 group-title="Noticias",RTU
+http://45.224.97.181:9999/RTU/index.m3u8
+
+#EXTINF:-1 group-title="Religioso",Asomavision
+https://asomatv.cloud-ip.cc/livestream/stream.m3u8
+
+#EXTINF:-1 group-title="Religioso",IeanJesus Ecuador
+https://cloud37.ecuatel.com/iglesia2020/Stream1/playlist.m3u8
+
+#EXTINF:-1 group-title="Religioso",TV Universal Ecuador
+https://cdn.mycloudstream.io/hls/live/broadcast/uwcedjt2/index.m3u8

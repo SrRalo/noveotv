@@ -4,6 +4,8 @@ import { VideoPlayer } from './components/VideoPlayer';
 import { ChannelList } from './components/ChannelList';
 import { CategoryFilter } from './components/CategoryFilter';
 import { ThemeToggle } from './components/ThemeToggle';
+import { WelcomeModal } from './components/WelcomeModal';
+import { KeyboardShortcutsModal } from './components/KeyboardShortcutsModal';
 import type { Channel } from './types';
 
 const MAX_SLOTS = 4;
@@ -22,6 +24,7 @@ export default function App() {
   const [isMobile, setIsMobile] = useState(() =>
     typeof window !== 'undefined' ? window.innerWidth < 768 : false
   );
+  const [showShortcuts, setShowShortcuts] = useState(false);
 
   useEffect(() => {
     const onResize = () => {
@@ -116,6 +119,19 @@ export default function App() {
           e.preventDefault();
           toggleMultiView();
           break;
+        case 'f':
+        case 'F': {
+          e.preventDefault();
+          const container = document.querySelector('[class*="aspect-video"]');
+          if (container) {
+            if (!document.fullscreenElement) {
+              container.requestFullscreen().catch(() => {});
+            } else {
+              document.exitFullscreen().catch(() => {});
+            }
+          }
+          break;
+        }
         case 'Escape':
           break;
       }
@@ -126,12 +142,16 @@ export default function App() {
   }, [visibleChannels, selectedIndex, handleChannelSelect, toggleMultiView]);
 
   return (
+    <>
+    <WelcomeModal onComplete={() => {}} />
+    <KeyboardShortcutsModal trigger={showShortcuts} onClose={() => setShowShortcuts(false)} />
     <div className="h-screen flex flex-col bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 transition-colors">
-      <header className="flex items-center justify-between px-4 md:px-6 py-3 border-b border-gray-200 dark:border-gray-700">
+      <header className="flex items-center justify-between px-4 md:px-6 py-3 border-b border-gray-200 dark:border-gray-700 bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm">
         <div className="flex items-center gap-3">
           <button
             onClick={() => setSidebarOpen((v) => !v)}
-            className="hidden md:block p-2 rounded-lg bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors cursor-pointer"
+            aria-label={sidebarOpen ? 'Ocultar lista de canales' : 'Mostrar lista de canales'}
+            className="hidden md:block p-2 rounded-lg bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2"
             title={sidebarOpen ? 'Ocultar lista' : 'Mostrar lista'}
           >
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -142,16 +162,18 @@ export default function App() {
               )}
             </svg>
           </button>
-          <h1 className="text-xl font-bold tracking-tight">
-            <span className="text-indigo-600">Noveo</span>TV
+          <h1 className="text-2xl font-extrabold tracking-tight">
+            <span className="text-indigo-500 dark:text-indigo-400">Noveo</span>
+            <span className="text-gray-900 dark:text-white">TV</span>
           </h1>
         </div>
         <div className="flex items-center gap-2 md:gap-3">
           <button
             onClick={toggleMultiView}
-            className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors cursor-pointer ${
+            aria-label={isMultiView ? 'Cerrar multivista' : 'Abrir multivista'}
+            className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-medium transition-all duration-200 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2 hover:scale-105 active:scale-95 ${
               isMultiView
-                ? 'bg-indigo-600 text-white'
+                ? 'bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-lg shadow-indigo-500/25'
                 : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600'
             }`}
             title="Multivista (M)"
@@ -189,7 +211,8 @@ export default function App() {
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 placeholder="Buscar canales... (/)"
-                className="w-full pl-9 pr-3 py-2 text-sm rounded-lg bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 placeholder-gray-400"
+                aria-label="Buscar canales"
+                className="w-full pl-9 pr-3 py-2 text-sm rounded-lg bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 placeholder-gray-400 focus-visible:ring-indigo-500"
               />
             </div>
           </div>
@@ -272,7 +295,8 @@ export default function App() {
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
                   placeholder="Buscar canales..."
-                  className="w-full pl-9 pr-3 py-2 text-sm rounded-lg bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 placeholder-gray-400"
+                  aria-label="Buscar canales"
+                  className="w-full pl-9 pr-3 py-2 text-sm rounded-lg bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 placeholder-gray-400 focus-visible:ring-indigo-500"
                 />
               </div>
               {isMultiView && (
@@ -298,10 +322,17 @@ export default function App() {
       </div>
 
       {!isMobile && (
-        <div className="hidden md:block fixed bottom-3 left-3 text-[11px] text-gray-400 opacity-60">
-          ↑ ↓ Navegar · Enter Seleccionar · M Multivista · F Pantalla completa · / Buscar
+        <div className="hidden md:block fixed bottom-3 left-3 text-[11px] text-gray-400">
+          <button 
+            onClick={() => setShowShortcuts(true)}
+            className="flex items-center gap-2 px-3 py-1.5 bg-gray-100 dark:bg-gray-800 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
+          >
+            <kbd className="px-1.5 py-0.5 bg-white dark:bg-gray-700 rounded text-xs font-mono border border-gray-200 dark:border-gray-600">?</kbd>
+            <span>Atajos de teclado</span>
+          </button>
         </div>
       )}
     </div>
+    </>
   );
 }

@@ -4,9 +4,10 @@ export interface StreamSource {
 }
 
 export interface Channel {
+  id?: string;
   name: string;
   group: string;
-  type: 'hls' | 'embed';
+  type: 'hls' | 'embed' | 'ts';
   url: string;
   poster?: string;
   sources?: StreamSource[];

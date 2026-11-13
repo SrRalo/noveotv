@@ -3,10 +3,12 @@ import type { Channel, PpvResponse, StreamSource } from '../types';
 const TARGET_CATEGORY = 'Football';
 
 export async function fetchPpvStreams(): Promise<Channel[]> {
-  const res = await fetch('/api/ppv');
-  if (!res.ok) return [];
-  const data: PpvResponse = await res.json();
-  if (!data.success) return [];
+  try {
+    const res = await fetch('/api/ppv');
+    if (!res.ok) return [];
+    const data: PpvResponse = await res.json();
+    if (!data.success) return [];
+
 
   const channels: Channel[] = [];
 
@@ -47,4 +49,7 @@ export async function fetchPpvStreams(): Promise<Channel[]> {
   }
 
   return channels;
+  } catch {
+    return [];
+  }
 }
